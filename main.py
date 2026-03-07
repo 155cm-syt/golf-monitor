@@ -51,3 +51,36 @@ if results:
     st.header("🏆 利益ランキング")
 
     st.dataframe(df)
+    st.markdown("---")
+st.markdown("## 🧾 メルカリ Sold 相場チェッカー")
+
+club_query = st.text_input("クラブ名（Sold検索）")
+
+if club_query:
+    mercari_sold = f"https://jp.mercari.com/search?keyword={club_query}&status=sold_out"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club_query}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club_query}"
+    gdo = f"https://shop.golfdigest.co.jp/search/?q={club_query}"
+
+    st.write("🟥 メルカリ Sold", mercari_sold)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+    st.write("🟣 GDO", gdo)
+
+    buy_price = st.number_input("仕入れ価格", key="sold_buy")
+    sold_price = st.number_input("メルカリSold平均価格（自分で入力）", key="sold_sell")
+
+    if buy_price > 0 and sold_price > 0:
+        profit = sold_price - buy_price
+        rate = (profit / buy_price) * 100
+
+        st.markdown("### 📊 利益結果")
+        st.write(f"利益: {profit} 円")
+        st.write(f"利益率: {rate:.1f} %")
+
+        if rate >= 40:
+            st.success("🔥 利益チャンス")
+        elif rate >= 20:
+            st.info("👍 利益あり")
+        else:
+            st.warning("⚠️ 利益薄い")
