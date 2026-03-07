@@ -53,3 +53,39 @@ if product_name:
             st.info("👍 仕入れ候補")
         else:
             st.warning("⚠️ 利益薄め")
+            st.markdown("---")
+st.markdown("## 🧠 利益ランキング")
+
+site_prices = {
+    "ゴルフ5": golf5_price,
+    "ゴルフパートナー": partner_price,
+    "GDO": gdo_price
+}
+
+results = []
+
+for site, price in site_prices.items():
+    if price > 0 and buy_price > 0:
+        profit = price - buy_price
+        rate = (profit / buy_price) * 100
+        results.append({
+            "サイト": site,
+            "販売価格": price,
+            "利益": profit,
+            "利益率": round(rate,1)
+        })
+
+if results:
+    import pandas as pd
+    df = pd.DataFrame(results)
+    df = df.sort_values("利益率", ascending=False)
+
+    st.dataframe(df)
+
+    best = df.iloc[0]
+
+    st.markdown("### 🏆 ベスト販売先")
+
+    st.success(
+        f"{best['サイト']}で販売 → 利益 {best['利益']}円 / 利益率 {best['利益率']}%"
+    )
