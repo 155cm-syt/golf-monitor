@@ -273,3 +273,41 @@ if store_club:
             st.info("👍 利益あり")
         else:
             st.warning("⚠️ 見送り")
+            st.markdown("---")
+st.markdown("## 🤖 完全AIクラブスキャナー")
+
+club = st.text_input("クラブ名入力")
+
+if club:
+
+    mercari = f"https://jp.mercari.com/search?keyword={club}&status=sold_out"
+    yahoo = f"https://auctions.yahoo.co.jp/search/search?p={club}"
+    rakuten = f"https://search.rakuten.co.jp/search/mall/{club}/"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+
+    st.write("🟥 メルカリ sold", mercari)
+    st.write("🟡 ヤフオク落札", yahoo)
+    st.write("🔴 楽天市場", rakuten)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+
+    buy = st.number_input("仕入れ価格")
+    market = st.number_input("相場価格")
+
+    if buy > 0 and market > 0:
+
+        profit = market - buy
+        rate = (profit / buy) * 100
+
+        st.markdown("### 💰 AI利益判定")
+
+        st.write(f"利益: {profit} 円")
+        st.write(f"利益率: {rate:.1f} %")
+
+        if rate >= 40:
+            st.success("🔥 仕入れチャンス")
+        elif rate >= 20:
+            st.info("👍 利益あり")
+        else:
+            st.warning("⚠️ 利益薄い")
