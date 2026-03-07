@@ -205,3 +205,37 @@ if brand_results:
     st.markdown("### 🏆 ブランド利益ランキング")
 
     st.dataframe(df)
+    st.markdown("---")
+st.markdown("## 📊 相場AIチェッカー")
+
+market_club = st.text_input("クラブ名（相場検索）")
+
+if market_club:
+
+    mercari_sold = f"https://jp.mercari.com/search?keyword={market_club}&status=sold_out"
+    yahoo = f"https://auctions.yahoo.co.jp/search/search?p={market_club}"
+    rakuten = f"https://search.rakuten.co.jp/search/mall/{market_club}/"
+
+    st.write("🟥 メルカリ sold", mercari_sold)
+    st.write("🟡 ヤフオク落札", yahoo)
+    st.write("🔴 楽天市場", rakuten)
+
+    buy_price = st.number_input("仕入れ価格", key="market_buy")
+    market_price = st.number_input("相場価格", key="market_sell")
+
+    if buy_price > 0 and market_price > 0:
+
+        profit = market_price - buy_price
+        rate = (profit / buy_price) * 100
+
+        st.markdown("### 📈 利益結果")
+
+        st.write(f"利益: {profit} 円")
+        st.write(f"利益率: {rate:.1f} %")
+
+        if rate >= 40:
+            st.success("🔥 利益チャンス")
+        elif rate >= 20:
+            st.info("👍 利益あり")
+        else:
+            st.warning("⚠️ 利益薄い")
