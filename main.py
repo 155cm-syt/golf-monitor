@@ -342,3 +342,59 @@ for club in radar_clubs:
     st.write("🟢 ゴルフパートナー", partner)
 
     st.markdown("---")
+    st.markdown("---")
+st.markdown("## 🧠 最終AI（利益クラブランキング）")
+
+import pandas as pd
+
+ai_clubs = [
+"Qi10 ドライバー",
+"ステルス2 ドライバー",
+"SIM2 ドライバー",
+"G430 ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー",
+"TSR2 ドライバー",
+"ZX5 ドライバー"
+]
+
+ai_results = []
+
+for club in ai_clubs:
+
+    st.subheader(club)
+
+    mercari = f"https://jp.mercari.com/search?keyword={club}&status=sold_out"
+    yahoo = f"https://auctions.yahoo.co.jp/search/search?p={club}"
+    rakuten = f"https://search.rakuten.co.jp/search/mall/{club}/"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+
+    st.write("🟥 メルカリ sold", mercari)
+    st.write("🟡 ヤフオク落札", yahoo)
+    st.write("🔴 楽天市場", rakuten)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+
+    buy = st.number_input(f"{club} 仕入れ価格", key=club+"final_buy")
+    sell = st.number_input(f"{club} 想定販売価格", key=club+"final_sell")
+
+    if buy > 0 and sell > 0:
+
+        profit = sell - buy
+        rate = (profit / buy) * 100
+
+        ai_results.append({
+            "クラブ": club,
+            "利益": profit,
+            "利益率": round(rate,1)
+        })
+
+if ai_results:
+
+    df = pd.DataFrame(ai_results)
+    df = df.sort_values("利益率", ascending=False)
+
+    st.markdown("### 🏆 AI利益ランキング")
+
+    st.dataframe(df)
