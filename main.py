@@ -163,3 +163,55 @@ if results:
     st.markdown("## 🏆 利益ランキング")
 
     st.dataframe(df)
+    st.markdown("---")
+st.markdown("## 🤖 自動クラブスキャナー")
+
+clubs = [
+"Qi10 ドライバー",
+"ステルス2 ドライバー",
+"SIM2 ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー"
+]
+
+import pandas as pd
+
+scan_results = []
+
+for club in clubs:
+
+    st.markdown(f"### ⛳ {club}")
+
+    google = f"https://www.google.com/search?tbm=shop&q={club}"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+    gdo = f"https://shop.golfdigest.co.jp/search/?q={club}"
+
+    st.write("🌐 Google相場", google)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+    st.write("🟣 GDO", gdo)
+
+    buy = st.number_input(f"{club} 仕入れ価格", key=club+"buy")
+
+    sell = st.number_input(f"{club} 想定販売価格", key=club+"sell")
+
+    if buy > 0 and sell > 0:
+
+        profit = sell - buy
+        rate = (profit / buy) * 100
+
+        scan_results.append({
+            "クラブ": club,
+            "利益": profit,
+            "利益率": round(rate,1)
+        })
+
+if scan_results:
+
+    df = pd.DataFrame(scan_results)
+    df = df.sort_values("利益率", ascending=False)
+
+    st.markdown("## 🏆 利益クラブランキング")
+
+    st.dataframe(df)
