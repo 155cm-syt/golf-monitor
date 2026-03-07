@@ -1,14 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import schedule
 import time
+import schedule
 
 #################################
 # 設定
 #################################
 
-TARGET_SHAFTS = [
+SHAFT_KEYWORDS = [
     "VENTUS",
     "Tour AD",
     "Speeder"
@@ -17,45 +17,45 @@ TARGET_SHAFTS = [
 MIN_PROFIT_RATE = 0.10
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent":"Mozilla/5.0"
 }
 
 #################################
-# 店舗データ取得
+# 店舗取得
 #################################
 
 def get_store_items():
 
     url = "https://www.golfpartner.co.jp/shop/"
 
-    r = requests.get(url, headers=HEADERS)
+    r = requests.get(url,headers=HEADERS)
 
-    soup = BeautifulSoup(r.text, "lxml")
-
-    clubs = []
+    soup = BeautifulSoup(r.text,"lxml")
 
     items = soup.select(".item")
 
+    clubs = []
+
     for item in items:
 
-        name_tag = item.select_one(".name")
-        price_tag = item.select_one(".price")
+        name = item.select_one(".name")
+        price = item.select_one(".price")
 
-        if not name_tag or not price_tag:
+        if not name or not price:
             continue
 
-        name = name_tag.text.strip()
+        n = name.text.strip()
 
-        price = price_tag.text.replace("¥","").replace(",","")
+        p = price.text.replace("¥","").replace(",","")
 
         try:
-            price = int(price)
+            p = int(p)
         except:
             continue
 
         clubs.append({
-            "name": name,
-            "buy_price": price
+            "name":n,
+            "buy":p
         })
 
     return clubs
@@ -64,13 +64,13 @@ def get_store_items():
 # シャフト検出
 #################################
 
-def detect_shaft(text):
+def detect_shaft(name):
 
-    for shaft in TARGET_SHAFTS:
+    for s in SHAFT_KEYWORDS:
 
-        if shaft.lower() in text.lower():
+        if s.lower() in name.lower():
 
-            return shaft
+            return s
 
     return None
 
@@ -78,17 +78,17 @@ def detect_shaft(text):
 # メルカリ価格取得
 #################################
 
-def mercari_average_price(keyword):
+def mercari_avg(keyword):
 
     url = f"https://jp.mercari.com/search?keyword={keyword}"
 
-    r = requests.get(url, headers=HEADERS)
+    r = requests.get(url,headers=HEADERS)
 
-    soup = BeautifulSoup(r.text, "lxml")
+    soup = BeautifulSoup(r.text,"lxml")
 
-    prices = soup.select("span")
+    prices = soup.find_all("span")
 
-    price_list = []
+    result = []
 
     for p in prices:
 
@@ -102,36 +102,43 @@ def mercari_average_price(keyword):
 
                 if 5000 < value < 100000:
 
-                    price_list.append(value)
+                    result.append(value)
 
             except:
                 pass
 
-    if len(price_list) == 0:
-
+    if len(result) == 0:
         return 0
 
-    return int(sum(price_list[:10]) / min(len(price_list),10))
+    return int(sum(result[:10])/min(len(result),10))
 
 #################################
-# 利益計算
+# ヘッド価格
 #################################
 
-def calc_profit(buy, sell):
+def head_price(name):
 
-    profit = sell - buy
+    keyword = name + " ヘッド"
 
-    rate = profit / buy
-
-    return profit, rate
+    return mercari_avg(keyword)
 
 #################################
-# メインAI
+# シャフト価格
 #################################
 
-def golf_resale_ai():
+def shaft_price(shaft):
 
-    print("クラブ検索開始")
+    keyword = shaft + " シャフト"
+
+    return mercari_avg(keyword)
+
+#################################
+# AI分析
+#################################
+
+def golf_ai():
+
+    print("クラブ分析開始")
 
     clubs = get_store_items()
 
@@ -141,29 +148,37 @@ def golf_resale_ai():
 
         name = club["name"]
 
-        buy = club["buy_price"]
+        buy = club["buy"]
 
         shaft = detect_shaft(name)
 
-        if shaft:
+        if not shaft:
+            continue
 
-            sell_price = mercari_average_price(name)
+        head = head_price(name)
 
-            if sell_price == 0:
-                continue
+        shaft_val = shaft_price(shaft)
 
-            profit, rate = calc_profit(buy, sell_price)
+        sell = head + shaft_val
 
-            if rate >= MIN_PROFIT_RATE:
+        profit = sell - buy
 
-                results.append({
-                    "club": name,
-                    "shaft": shaft,
-                    "buy_price": buy,
-                    "sell_price": sell_price,
-                    "profit": profit,
-                    "profit_rate": round(rate*100,1)
-                })
+        rate = profit / buy
+
+        if rate >= MIN_PROFIT_RATE:
+
+            results.append({
+
+                "club":name,
+                "shaft":shaft,
+                "buy":buy,
+                "head_price":head,
+                "shaft_price":shaft_val,
+                "sell_total":sell,
+                "profit":profit,
+                "profit_rate":round(rate*100,1)
+
+            })
 
     df = pd.DataFrame(results)
 
@@ -173,15 +188,15 @@ def golf_resale_ai():
 
     else:
 
-        print("\n🔥利益クラブ候補\n")
+        print("\n🔥利益クラブランキング\n")
 
-        print(df.sort_values("profit", ascending=False))
+        print(df.sort_values("profit",ascending=False))
 
 #################################
-# 定期実行
+# 定期巡回
 #################################
 
-schedule.every(60).minutes.do(golf_resale_ai)
+schedule.every(30).minutes.do(golf_ai)
 
 print("ゴルフ転売AI起動")
 
