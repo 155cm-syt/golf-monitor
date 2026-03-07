@@ -115,3 +115,51 @@ if st.button("人気クラブを検索"):
         st.write("🟣 GDO", gdo)
 
         st.markdown("---")
+        st.markdown("---")
+st.markdown("## 🚀 価格差クラブスキャナー")
+
+clubs = [
+"Qi10 ドライバー",
+"ステルス2 ドライバー",
+"SIM2 ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー",
+"TSR2 ドライバー"
+]
+
+results = []
+
+for club in clubs:
+
+    st.markdown(f"### ⛳ {club}")
+
+    buy = st.number_input(f"{club} 仕入れ価格", key=club+"buy")
+
+    golf5 = st.number_input(f"{club} ゴルフ5価格", key=club+"g5")
+    partner = st.number_input(f"{club} ゴルフパートナー価格", key=club+"gp")
+    gdo = st.number_input(f"{club} GDO価格", key=club+"gdo")
+
+    prices = [p for p in [golf5, partner, gdo] if p > 0]
+
+    if prices and buy > 0:
+
+        max_price = max(prices)
+        profit = max_price - buy
+        rate = (profit / buy) * 100
+
+        results.append({
+            "クラブ": club,
+            "利益": profit,
+            "利益率": round(rate,1)
+        })
+
+if results:
+
+    import pandas as pd
+
+    df = pd.DataFrame(results)
+    df = df.sort_values("利益率", ascending=False)
+
+    st.markdown("## 🏆 利益ランキング")
+
+    st.dataframe(df)
