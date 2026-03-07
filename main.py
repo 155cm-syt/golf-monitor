@@ -239,3 +239,37 @@ if market_club:
             st.info("👍 利益あり")
         else:
             st.warning("⚠️ 利益薄い")
+st.markdown("---")
+st.markdown("## 🏪 店舗スキャナーAI")
+
+store_club = st.text_input("店舗で見つけたクラブ")
+
+if store_club:
+
+    mercari = f"https://jp.mercari.com/search?keyword={store_club}&status=sold_out"
+    yahoo = f"https://auctions.yahoo.co.jp/search/search?p={store_club}"
+    rakuten = f"https://search.rakuten.co.jp/search/mall/{store_club}/"
+
+    st.write("🟥 メルカリ売却相場", mercari)
+    st.write("🟡 ヤフオク落札相場", yahoo)
+    st.write("🔴 楽天販売相場", rakuten)
+
+    buy = st.number_input("店舗価格", key="store_buy")
+    sell = st.number_input("相場価格", key="store_sell")
+
+    if buy > 0 and sell > 0:
+
+        profit = sell - buy
+        rate = (profit / buy) * 100
+
+        st.markdown("### 💰 利益判定")
+
+        st.write(f"利益: {profit} 円")
+        st.write(f"利益率: {rate:.1f} %")
+
+        if rate >= 40:
+            st.success("🔥 仕入れ候補")
+        elif rate >= 20:
+            st.info("👍 利益あり")
+        else:
+            st.warning("⚠️ 見送り")
