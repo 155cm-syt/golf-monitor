@@ -311,3 +311,34 @@ if club:
             st.info("👍 利益あり")
         else:
             st.warning("⚠️ 利益薄い")
+            st.markdown("---")
+st.markdown("## 📡 レーダーAI（利益候補クラブ）")
+
+radar_clubs = [
+"Qi10 ドライバー",
+"ステルス2 ドライバー",
+"SIM2 ドライバー",
+"G430 ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー",
+"TSR2 ドライバー",
+"ZX5 ドライバー"
+]
+
+for club in radar_clubs:
+
+    st.subheader(club)
+
+    mercari = f"https://jp.mercari.com/search?keyword={club}&status=sold_out"
+    yahoo = f"https://auctions.yahoo.co.jp/search/search?p={club}"
+    rakuten = f"https://search.rakuten.co.jp/search/mall/{club}/"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+
+    st.write("🟥 メルカリ sold", mercari)
+    st.write("🟡 ヤフオク落札", yahoo)
+    st.write("🔴 楽天市場", rakuten)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+
+    st.markdown("---")
