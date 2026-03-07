@@ -84,3 +84,57 @@ if club_query:
             st.info("👍 利益あり")
         else:
             st.warning("⚠️ 利益薄い")
+            st.markdown("---")
+st.markdown("## 🤖 利益クラブ自動発見AI")
+
+scan_clubs = [
+"Qi10 ドライバー",
+"ステルス2 ドライバー",
+"SIM2 ドライバー",
+"G430 ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー",
+"TSR2 ドライバー",
+"ZX5 ドライバー"
+]
+
+import pandas as pd
+
+auto_results = []
+
+for club in scan_clubs:
+
+    st.subheader(club)
+
+    mercari = f"https://jp.mercari.com/search?keyword={club}"
+    golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+    partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+    gdo = f"https://shop.golfdigest.co.jp/search/?q={club}"
+
+    st.write("🟥 メルカリ", mercari)
+    st.write("🔵 ゴルフ5", golf5)
+    st.write("🟢 ゴルフパートナー", partner)
+    st.write("🟣 GDO", gdo)
+
+    buy = st.number_input(f"{club} 仕入れ価格", key=club+"auto_buy")
+    sell = st.number_input(f"{club} 想定販売価格", key=club+"auto_sell")
+
+    if buy > 0 and sell > 0:
+
+        profit = sell - buy
+        rate = (profit / buy) * 100
+
+        auto_results.append({
+            "クラブ": club,
+            "利益": profit,
+            "利益率": round(rate,1)
+        })
+
+if auto_results:
+
+    df = pd.DataFrame(auto_results)
+    df = df.sort_values("利益率", ascending=False)
+
+    st.markdown("### 🏆 利益クラブランキング")
+
+    st.dataframe(df)
