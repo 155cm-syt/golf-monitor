@@ -89,3 +89,29 @@ if results:
     st.success(
         f"{best['サイト']}で販売 → 利益 {best['利益']}円 / 利益率 {best['利益率']}%"
     )
+    st.markdown("---")
+st.markdown("## 🤖 人気クラブ一括検索")
+
+clubs = [
+"ステルス ドライバー",
+"SIM2 ドライバー",
+"ローグST ドライバー",
+"G425 ドライバー",
+"パラダイム ドライバー"
+]
+
+if st.button("人気クラブを検索"):
+    
+    for club in clubs:
+
+        st.markdown(f"### ⛳ {club}")
+
+        golf5 = f"https://www.alpen-group.jp/store/search?keyword={club}"
+        partner = f"https://www.golfpartner.co.jp/shop/?keyword={club}"
+        gdo = f"https://shop.golfdigest.co.jp/search/?q={club}"
+
+        st.write("🔵 ゴルフ5", golf5)
+        st.write("🟢 ゴルフパートナー", partner)
+        st.write("🟣 GDO", gdo)
+
+        st.markdown("---")
